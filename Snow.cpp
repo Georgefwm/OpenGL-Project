@@ -58,7 +58,7 @@ void Snow::TickEvents(GLFWwindow* window, double deltaTime)
 
 	if (CanFallFurther(height))
 	{
-		Fall(height, deltaTime);
+		Fall(height, deltaTime, this->snowVerts[0]);
 	}
 }
 
@@ -73,7 +73,7 @@ bool Snow::CanFallFurther(int windowHeight)
 	// TODO: check if other snow is beneath this one
 }
 
-void Snow::Fall(int windowHeight, double deltaTime)
+void Snow::Fall(int windowHeight, double deltaTime, Vertex *verts)  // TODO: Win the battle agaisnt immutable structs 
 {
 	float normFallSpeed = m_FallSpeed / windowHeight;
 
@@ -90,12 +90,8 @@ void Snow::Fall(int windowHeight, double deltaTime)
 		return;
 	}
 
-	Vertex v[6];
-	std::memcpy(&v, &this->snowVerts, sizeof(this->snowVerts));
-	for (Vertex newV : v)
-	{
-		float moveDelta = newV.Position.y + normFallSpeed * (float)deltaTime;
-		newV.Position.y = moveDelta;
-	}
-	std::memcpy(&this->snowVerts, &v, sizeof(v));
+	verts[0].Position.y = 1.0f - m_Size;
+
+	float moveDelta = verts[0].Position.y + normFallSpeed * (float)deltaTime;
+
 }

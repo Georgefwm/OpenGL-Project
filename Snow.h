@@ -43,7 +43,7 @@ public:
 
 	bool CanFallFurther(int windowHeight);
 
-	void Fall(int windowHeight, double deltaTime);
+	void Fall(int windowHeight, double deltaTime, Vertex *verts);
 };
 
 #endif
