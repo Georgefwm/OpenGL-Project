@@ -9,16 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Resource Files\Shaders">
-      <UniqueIdentifier>{b6e37080-25db-4d81-a77f-66e08bf61807}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Textures">
-      <UniqueIdentifier>{0cb20ba5-95b3-4f65-83a6-869177e7fd26}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
@@ -53,16 +43,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="default.vert">
-      <Filter>Resource Files\Shaders</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="default.frag">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="ShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -89,8 +69,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="swirls.png">
-      <Filter>Resource Files\Textures</Filter>
-    </Image>
+    <None Include="default.frag">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="default.vert">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -138,6 +138,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)default.vert $(SolutionDir)$(Platform)\$(Configuration)\default.vert
+copy $(SolutionDir)default.frag $(SolutionDir)$(Platform)\$(Configuration)\default.frag</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Controller.cpp" />
@@ -166,9 +170,6 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="swirls.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
