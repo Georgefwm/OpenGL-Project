@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 #define WINDOWWIDTH 800
 #define WINDOWHEIGHT 800
@@ -16,27 +18,33 @@
 #include "Snow.h"
 #include "Utils.h"
 
+
 std::vector<Snow> entities;
+bool lButtonDown = false;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-	{
-		return;
-	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		double xpos, ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (GLFW_PRESS == action)
+			lButtonDown = true;
+		else if (GLFW_RELEASE == action)
+			lButtonDown = false;
+	}	
+}
 
-		int width, height;
-		glfwGetWindowSize(window, &width, &height);
+void WhileLMousePressed(GLFWwindow* window)
+{
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
 
-		if (entities.size() < MAXSNOWCOUNT)
-		{
-			Snow s = Snow(Utils::Normalise(window, xpos, width), Utils::Normalise(window, ypos, height));
-			entities.push_back(s);
-		}
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+
+	if (entities.size() < MAXSNOWCOUNT)
+	{
+		Snow s = Snow(Utils::Normalise(window, xpos, width), Utils::Normalise(window, ypos, height));
+		entities.push_back(s);
+
 	}
 }
 
@@ -135,10 +143,28 @@ int main()
 		//// Take care of all GLFW events
 		glfwPollEvents();
 
-		for (Snow& s : entities)
+		if (lButtonDown) WhileLMousePressed(window);
+
+
+		std::vector<int> elemsToRemove;
+		for (int i = 0; i < entities.size(); i++)
 		{
-			Snow::TickEvents(window, deltaTime, s);
+			Snow& ref = entities[i];
+			Snow::TickEvents(window, deltaTime, ref, entities, i);
+
+			// remove expired elements
+			if (ref.m_DeathTimer <= 0) elemsToRemove.push_back(i);
 		}
+
+		for (int i : elemsToRemove)
+		{
+			if (i < entities.size())
+			{
+				entities.erase(entities.begin() + i);
+			}
+		}
+		
+		elemsToRemove.clear();
 
 		// Specify the color of the background
 		glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
@@ -150,9 +176,10 @@ int main()
 		
 		int offset = 0;
 		int count = 0;
-		for (Snow s : entities)
+		for (int i = 0; i < entities.size(); i++)
 		{
-			s.GetVerticesAsArray(vertices, offset);
+			Snow& ref = entities[i];
+			Snow::GetVerticesAsArray(vertices, ref, offset);
 			offset += 30;
 			count += 6;
 		}
