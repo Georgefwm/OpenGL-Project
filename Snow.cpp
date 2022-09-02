@@ -8,12 +8,12 @@ Snow::Snow(float normWidth, float normHeight)
 	float left = normWidth - (m_Size / 2);
 	float top = normHeight - (m_Size / 2);
 
-	this->m_XVertices = { left + m_Size, left, left + m_Size, left + m_Size, left, left + m_Size };
-	this->m_YVertices = { top, top + m_Size, top + m_Size, top, top, top + m_Size };
+	this->m_XVertices = { left,				left,			left + m_Size,		left + m_Size,		left,	left + m_Size };
+	this->m_YVertices = { top,				top + m_Size,	top + m_Size,		top,				top,	top + m_Size };
 
-	this->m_XColor = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
-	this->m_YColor = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
-	this->m_ZColor = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
+	this->m_XColor = { 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
+	this->m_YColor = { 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
+	this->m_ZColor = { 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
 
 	this->orderingValue = m_YVertices[5];
 }

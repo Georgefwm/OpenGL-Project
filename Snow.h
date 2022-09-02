@@ -20,7 +20,7 @@ public:
 	int m_DeathTimer = 1000; // in frames
 	bool remove = false;
 	const float m_FallSpeed = 100.0f;
-	const float m_Size = 0.02f;
+	const float m_Size = 0.01f;
 	float orderingValue;
 
 	inline std::vector<float>& GetYValues() { return m_YVertices; }

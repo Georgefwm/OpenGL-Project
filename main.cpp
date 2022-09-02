@@ -32,19 +32,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	}	
 }
 
-void WhileLMousePressed(GLFWwindow* window)
+void WhileLMousePressed(double x, double y, int width, int height)
 {
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-
 	if (entities.size() < MAXSNOWCOUNT)
 	{
-		Snow s = Snow(Utils::Normalise(window, xpos, width), Utils::Normalise(window, ypos, height));
+		Snow s = Snow(Utils::Normalise(x, width), Utils::Normalise(y, height));
 		entities.push_back(s);
-
 	}
 }
 
@@ -129,7 +122,9 @@ int main()
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	double lastFrame = glfwGetTime();
-	
+
+	Snow s = Snow(0, 0);
+	entities.push_back(s);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -143,8 +138,16 @@ int main()
 		//// Take care of all GLFW events
 		glfwPollEvents();
 
-		if (lButtonDown) WhileLMousePressed(window);
+		if (lButtonDown)
+		{
+			double xpos, ypos;
+			glfwGetCursorPos(window, &xpos, &ypos);
 
+			int width, height;
+			glfwGetWindowSize(window, &width, &height);
+
+			WhileLMousePressed(xpos, ypos, width, height);
+		}
 
 		std::vector<int> elemsToRemove;
 		for (int i = 0; i < entities.size(); i++)
