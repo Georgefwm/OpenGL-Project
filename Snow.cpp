@@ -17,7 +17,7 @@ Snow::Snow(float normWidth, float normHeight)
 
 	this->orderingValue = m_YVertices[5];
 	this->m_DeathTimer = 500;
-	this->m_Static = false;
+	this->m_Stationary = false;
 	this->remove = false;
 }
 
@@ -39,9 +39,19 @@ Snow::~Snow()
 {
 }
 
+void Snow::SetStationary()
+{
+	this->m_Stationary = true;
+}
+
+bool Snow::IsStationary()
+{
+	return this->m_Stationary;
+}
+
 void Snow::TickEvents(GLFWwindow* window, double deltaTime, Snow& s, std::vector<Snow>& entities, int index)
 {
-	if (!s.m_Static)
+	if (!s.IsStationary())
 	{
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
@@ -64,23 +74,20 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 	
 	for (int i = 0; i < entities.size(); i++)
 	{
-		if (entities[i].m_Static)
+		if (entities[i].IsStationary() && !s.IsStationary())
 		{
 			Snow& ref = entities[i];
 			RECT RectB = Snow::GetSides(ref);
 
 			// if within some y range
-			if ((RectB.top - RectA.bottom) < normFallSpeed * deltaTime)
+			if (GetBottomYPos(s) + normFallSpeed * deltaTime > RectB.top)
 			{	
 				// then check if within some x range
-				if (RectA.right > RectB.left && RectA.left < RectB.right)
+				if (sqrt(pow((RectA.left + (s.m_Size / 2)) - (RectB.left + (s.m_Size / 2)), 2)) < s.m_Size/1.5)
 				{
-					if (GetBottomYPos(s) + normFallSpeed * deltaTime > RectB.top)
-					{
-						SetBottomCoord(s, RectB.top);
-						s.m_Static = true;
-						return;
-					}
+					SetBottomCoord(s, GetBottomYPos(s) + normFallSpeed * deltaTime);
+					s.SetStationary();
+					return;
 				}
 			}
 		}
@@ -91,7 +98,7 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 	if (GetBottomYPos(s) + normFallSpeed * deltaTime > 1.0f)
 	{
 		SetBottomCoord(s, 1.0f);
-		s.m_Static = true;
+		s.SetStationary();
 		return;
 	}
 

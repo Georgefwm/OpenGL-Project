@@ -25,11 +25,11 @@ public:
 	std::vector<float> m_YColor;
 	std::vector<float> m_ZColor;
 
-	bool m_Static;
+	bool m_Stationary;
 	int m_DeathTimer; 
 	bool remove;
 	const float m_FallSpeed = 200.0f;
-	const float m_Size = 0.2f;
+	const float m_Size = 0.01f;
 	float orderingValue;
 
 	inline std::vector<float>& GetYValues() { return m_YVertices; }
@@ -54,6 +54,10 @@ public:
 	static float GetBottomYPos(Snow& s);
 
 	static RECT GetSides(Snow& s);
+
+	void SetStationary();
+
+	bool IsStationary();
 
 };
 

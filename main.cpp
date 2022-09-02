@@ -9,7 +9,7 @@
 
 #define WINDOWWIDTH 800
 #define WINDOWHEIGHT 800
-#define MAXSNOWCOUNT 1000
+#define MAXSNOWCOUNT 5000
 
 #include "Texture.h"
 #include "ShaderClass.h"
@@ -164,7 +164,7 @@ int main()
 		}
 
 
-		if (lButtonDown && currentFrame-lastSpawn > 0.1) // snow spawn limit
+		if (lButtonDown && currentFrame-lastSpawn > 0.01) // snow spawn limit
 		{
 			double xpos, ypos;
 			glfwGetCursorPos(window, &xpos, &ypos);
