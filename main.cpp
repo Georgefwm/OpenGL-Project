@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 #include <vector>
+#include <thread>
 #include <algorithm>
 #include <iterator>
 
@@ -21,6 +22,7 @@
 
 std::vector<Snow> entities;
 bool lButtonDown = false;
+bool paused = false;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -29,7 +31,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			lButtonDown = true;
 		else if (GLFW_RELEASE == action)
 			lButtonDown = false;
-	}	
+	}
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+		entities.clear();
+
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		paused = !paused;
 }
 
 void WhileLMousePressed(double x, double y, int width, int height)
@@ -40,6 +51,7 @@ void WhileLMousePressed(double x, double y, int width, int height)
 		entities.push_back(s);
 	}
 }
+
 
 int main()
 {
@@ -120,8 +132,10 @@ int main()
 
 	// Binds keys
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetKeyCallback(window, key_callback);
 
 	double lastFrame = glfwGetTime();
+	double lastSpawn = glfwGetTime();
 
 	Snow s = Snow(0, 0);
 	entities.push_back(s);
@@ -134,11 +148,23 @@ int main()
 		double deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		
+		
 
 		//// Take care of all GLFW events
 		glfwPollEvents();
 
-		if (lButtonDown)
+
+		while (paused)
+		{
+			glfwPollEvents();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			double currentFrame = glfwGetTime();
+			double deltaTime = currentFrame - lastFrame;
+			lastFrame = currentFrame;
+		}
+
+
+		if (lButtonDown && currentFrame-lastSpawn > 0.1) // snow spawn limit
 		{
 			double xpos, ypos;
 			glfwGetCursorPos(window, &xpos, &ypos);
@@ -147,27 +173,23 @@ int main()
 			glfwGetWindowSize(window, &width, &height);
 
 			WhileLMousePressed(xpos, ypos, width, height);
+			lastSpawn = currentFrame;
 		}
 
-		std::vector<int> elemsToRemove;
+		int elemToRemove = -1;
 		for (int i = 0; i < entities.size(); i++)
 		{
 			Snow& ref = entities[i];
 			Snow::TickEvents(window, deltaTime, ref, entities, i);
 
 			// remove expired elements
-			if (ref.m_DeathTimer <= 0) elemsToRemove.push_back(i);
+
 		}
 
-		for (int i : elemsToRemove)
-		{
-			if (i < entities.size())
-			{
-				entities.erase(entities.begin() + i);
-			}
-		}
-		
-		elemsToRemove.clear();
+		// TODO: Figure out how to properly remove old particles
+		//std::vector<Snow>& ref = entities;
+		//auto erased = std::erase_if(entities, [](Snow& a) { return a.remove; });
+
 
 		// Specify the color of the background
 		glClearColor(0.01f, 0.01f, 0.01f, 1.0f);

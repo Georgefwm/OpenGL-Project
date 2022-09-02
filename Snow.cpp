@@ -16,6 +16,9 @@ Snow::Snow(float normWidth, float normHeight)
 	this->m_ZColor = { 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
 
 	this->orderingValue = m_YVertices[5];
+	this->m_DeathTimer = 500;
+	this->m_Static = false;
+	this->remove = false;
 }
 
 
@@ -42,37 +45,47 @@ void Snow::TickEvents(GLFWwindow* window, double deltaTime, Snow& s, std::vector
 	{
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
-		//if (!IsColliding(s, entities, index))
-		//{
-			Fall(height, deltaTime, s);
-		//}
+		Fall(height, deltaTime, s, entities);
 	}
-	else s.m_DeathTimer--;
+	/*else
+	{
+		if (s.m_DeathTimer <= 0) s.remove = true;
+		else s.m_DeathTimer = s.m_DeathTimer - 1;
+	}*/
 }
 
-bool Snow::IsColliding(Snow& s, std::vector<Snow> entities, int index)
+
+void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& entities)
 {
-	std::vector<float> thisSides = Snow::GetSides(s);
-	for (int i = index; i < entities.size(); i++)
+	float normFallSpeed = s.m_FallSpeed / windowHeight;
+
+
+	RECT RectA = Snow::GetSides(s);
+	
+	for (int i = 0; i < entities.size(); i++)
 	{
 		if (entities[i].m_Static)
 		{
-			std::vector<float> otherSides = Snow::GetSides(entities[i]);
-			//	  this.bottom > other.top   //   this.left > other.right     //   this.right < other.right
-			if (thisSides[3] > otherSides[2] && thisSides[0] < otherSides[1] && thisSides[0] < otherSides[1])
-			{
+			Snow& ref = entities[i];
+			RECT RectB = Snow::GetSides(ref);
 
+			// if within some y range
+			if ((RectB.top - RectA.bottom) < normFallSpeed * deltaTime)
+			{	
+				// then check if within some x range
+				if (RectA.right > RectB.left && RectA.left < RectB.right)
+				{
+					if (GetBottomYPos(s) + normFallSpeed * deltaTime > RectB.top)
+					{
+						SetBottomCoord(s, RectB.top);
+						s.m_Static = true;
+						return;
+					}
+				}
 			}
 		}
+		
 	}
-	return false;
-
-	// TODO: check if other snow is beneath this one
-}
-
-void Snow::Fall(int windowHeight, double deltaTime, Snow& s)
-{
-	float normFallSpeed = s.m_FallSpeed / windowHeight;
 
 	// If snow would fall below the bottom of window: set to bottom of window
 	if (GetBottomYPos(s) + normFallSpeed * deltaTime > 1.0f)
@@ -86,7 +99,6 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s)
 	for (float& y : s.GetYValues())
 	{
 		float tmp = y + normFallSpeed * deltaTime;
-
 		 y = tmp;
 	}
 	s.orderingValue = s.m_YVertices[5];
@@ -109,10 +121,14 @@ float Snow::GetBottomYPos(Snow& s)
 	return s.m_YVertices[5];
 }
 
-std::vector<float> Snow::GetSides(Snow& s)
+RECT Snow::GetSides(Snow& s)
 {
-	std::vector<float> sides = { s.m_XVertices[1] , s.m_XVertices[0], s.m_YVertices[0], s.m_YVertices[1] };
-	return sides;
+	RECT r;
+	r.left = s.m_XVertices[1];
+	r.right = s.m_XVertices[0];
+	r.top = s.m_YVertices[0];
+	r.bottom = s.m_YVertices[1];
+	return r;
 }
 
 
