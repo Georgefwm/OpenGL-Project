@@ -1,97 +1,84 @@
 #include "Snow.h"
 #include "Utils.h"
-#include <stdlib.h>
+#include <iostream>
 
 
 Snow::Snow(float normWidth, float normHeight)
 {
-	Vertex v1;
-	v1.Position = { normWidth - (m_Size / 2), normHeight - (m_Size / 2) };
-	v1.Color = { 1.0f, 1.0f, 1.0f };
+	float left = normWidth - (m_Size / 2);
+	float top = normHeight - (m_Size / 2);
 
-	Vertex v2;
-	v2.Position = { normWidth - (m_Size / 2), normHeight + (m_Size / 2) };
-	v2.Color = { 1.0f, 1.0f, 1.0f };
+	this->m_XVertices = { left + m_Size, left, left + m_Size, left + m_Size, left, left + m_Size };
+	this->m_YVertices = { top, top + m_Size, top + m_Size, top, top, top + m_Size };
 
-	Vertex v3;
-	v3.Position = { normWidth + (m_Size / 2), normHeight + (m_Size / 2) };
-	v3.Color = { 1.0f, 1.0f, 1.0f };
-
-	Vertex v4;
-	v4.Position = { normWidth + (m_Size / 2), normHeight - (m_Size / 2) };
-	v4.Color = { 1.0f, 1.0f, 1.0f };
-
-	Vertex v5;
-	v5.Position = { normWidth - (m_Size / 2), normHeight - (m_Size / 2) };
-	v5.Color = { 1.0f, 1.0f, 1.0f };
-
-	Vertex v6;
-	v6.Position = { normWidth + (m_Size / 2), normHeight + (m_Size / 2) };
-	v6.Color = { 0.5f, 0.5f, 0.5f };
-
-	Vertex tmp[] = { v1, v2, v3, v4, v5, v6 };
-	std::memcpy(&this->snowVerts, &tmp, sizeof(tmp));
+	this->m_XColor = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
+	this->m_YColor = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };
+	this->m_ZColor = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, };	
 }
 
 void Snow::GetVerticesAsArray(float arr[], int offset) {
 	int arrayOffset = offset;
 	for (int i = 0; i < 6; i++)
 	{
-		arr[arrayOffset+0] = this->snowVerts[i].Position.x;
-		arr[arrayOffset+1] = this->snowVerts[i].Position.y * (-1); // does the trick
-		arr[arrayOffset+2] = this->snowVerts[i].Color.x;
-		arr[arrayOffset+3] = this->snowVerts[i].Color.y;
-		arr[arrayOffset+4] = this->snowVerts[i].Color.z;
+		arr[arrayOffset+0] = this->m_XVertices[i];
+		arr[arrayOffset+1] = this->m_YVertices[i] * (-1); // does the trick
+		arr[arrayOffset+2] = this->m_XColor[i];
+		arr[arrayOffset+3] = this->m_YColor[i];
+		arr[arrayOffset+4] = this->m_ZColor[i];
 		arrayOffset += 5;
 	}
-
 }
 
 Snow::~Snow()
 {
 }
 
-void Snow::TickEvents(GLFWwindow* window, double deltaTime)
+void Snow::TickEvents(GLFWwindow* window, double deltaTime, Snow& s)
 {
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-
-	if (CanFallFurther(height))
+	if (!s.m_Static)
 	{
-		Fall(height, deltaTime, this->snowVerts[0]);
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+		Fall(height, deltaTime, s);
 	}
 }
 
-bool Snow::CanFallFurther(int windowHeight)
+bool Snow::CanFallFurther(int windowHeight, Snow& s, std::vector<Snow> entities)
 {
-	for (Vertex v : this->snowVerts)
+	for (float& f : s.m_YVertices)
 	{
-		if (v.Position.y > 1.0f) return false;
+		if (f > 1.0f) return false;
 	}
 	return true;
 
 	// TODO: check if other snow is beneath this one
 }
 
-void Snow::Fall(int windowHeight, double deltaTime, Vertex *verts)  // TODO: Win the battle agaisnt immutable structs 
+void Snow::Fall(int windowHeight, double deltaTime, Snow& s)
 {
-	float normFallSpeed = m_FallSpeed / windowHeight;
+	float normFallSpeed = s.m_FallSpeed / windowHeight;
 
-	if (this->snowVerts[5].Position.y + normFallSpeed * deltaTime > 1)
+	if (s.m_YVertices[5] + normFallSpeed * deltaTime > 1.0f)
 	{
 		// If snow would fall below the bottom of window: set to bottom of window
-		this->snowVerts[0].Position.y = 1.0f - m_Size;
-		this->snowVerts[1].Position.y = 1.0f;
-		this->snowVerts[2].Position.y = 1.0f - m_Size;
-		this->snowVerts[3].Position.y = 1.0f;
-		this->snowVerts[4].Position.y = 1.0f - m_Size;
-		this->snowVerts[5].Position.y = 1.0f;
-
-		return;
+		SetBottomCoord(s, 1.0f);
+		s.m_Static = true;
 	}
+	for (float& y : s.GetYValues())
+	{
+		float tmp = y + normFallSpeed * deltaTime;
 
-	verts[0].Position.y = 1.0f - m_Size;
+		 y = tmp;
+	}
+}
 
-	float moveDelta = verts[0].Position.y + normFallSpeed * (float)deltaTime;
-
+void Snow::SetBottomCoord(Snow& s, float pos) {
+	bool topXValues[6] = { true, false, false, true, true, false };
+	int i = 0;
+	for (auto& y : s.GetYValues())
+	{
+		if (topXValues[i]) s.m_YVertices[i] = pos - s.m_Size;
+		else s.m_YVertices[i] = pos;
+		i++;
+	}
 }

@@ -20,7 +20,11 @@ std::vector<Snow> entities;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	{
+		return;
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
@@ -32,7 +36,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
 			Snow s = Snow(Utils::Normalise(window, xpos, width), Utils::Normalise(window, ypos, height));
 			entities.push_back(s);
-			std::cout << "entities now has " << entities.size() << " elements." << std::endl;
 		}
 	}
 }
@@ -76,18 +79,18 @@ int main()
 	Shader shaderProgram("default.vert", "default.frag");
 
 	
-	Snow s = Snow(0.0f, 0.0f);
-	entities.push_back(s);
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
 	VAO1.Bind();
 	
-	float vertices[3000];
+	float * vertices;
 
-	s.GetVerticesAsArray(vertices);
+	vertices = (float*)malloc(sizeof(float) * 30 * MAXSNOWCOUNT);
+
 	
 	glEnableVertexAttribArray(0);
+
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO VBO1(vertices, sizeof(vertices));
 	
@@ -132,9 +135,9 @@ int main()
 		//// Take care of all GLFW events
 		glfwPollEvents();
 
-		for (int i = 0; i < entities.size(); i++)
+		for (Snow& s : entities)
 		{
-			entities[i].TickEvents(window, deltaTime);
+			Snow::TickEvents(window, deltaTime, s);
 		}
 
 		// Specify the color of the background
@@ -169,12 +172,13 @@ int main()
 		//std::cout << "errors: " << glGetError() << std::endl;
 
 	}
-
+	
 	// Delete all the objects we've created
 	VAO1.Delete();
 	VBO1.Delete();
 	//EBO1.Delete();
 	shaderProgram.Delete();
+	free(vertices);
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
