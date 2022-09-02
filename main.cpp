@@ -72,7 +72,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	// Create a GLFWwindow object
-	GLFWwindow* window = glfwCreateWindow(WINDOWWIDTH, WINDOWHEIGHT, "Snow - By George McLachlan", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOWWIDTH, WINDOWHEIGHT, "Pixel Snow - By George McLachlan", NULL, NULL);
 	if (window == NULL) // make sure it obeys
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
