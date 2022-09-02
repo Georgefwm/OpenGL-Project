@@ -57,6 +57,8 @@ void Snow::TickEvents(GLFWwindow* window, double deltaTime, Snow& s, std::vector
 		glfwGetWindowSize(window, &width, &height);
 		Fall(height, deltaTime, s, entities);
 	}
+
+	// TODO: fixing weird deleting behaviour
 	/*else
 	{
 		if (s.m_DeathTimer <= 0) s.remove = true;
@@ -64,7 +66,7 @@ void Snow::TickEvents(GLFWwindow* window, double deltaTime, Snow& s, std::vector
 	}*/
 }
 
-
+// Handles all aspects of falling
 void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& entities)
 {
 	float normFallSpeed = s.m_FallSpeed / windowHeight;
@@ -73,7 +75,8 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 	RECT RectA = Snow::GetSides(s);
 	
 	for (int i = 0; i < entities.size(); i++)
-	{
+	{	
+		// make sure to only collide with stationary snow, to avoid mid-air freezing
 		if (entities[i].IsStationary() && !s.IsStationary())
 		{
 			Snow& ref = entities[i];
@@ -83,7 +86,7 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 			if (GetBottomYPos(s) + normFallSpeed * deltaTime > RectB.top)
 			{	
 				// then check if within some x range
-				if (sqrt(pow((RectA.left + (s.m_Size / 2)) - (RectB.left + (s.m_Size / 2)), 2)) < s.m_Size/1.5)
+				if (sqrt(pow((RectA.left + (s.m_Size / 2)) - (RectB.left + (s.m_Size / 2)), 2)) < s.m_Size/1.5)  // not perfect but looks really weird when not divided
 				{
 					SetBottomCoord(s, GetBottomYPos(s) + normFallSpeed * deltaTime);
 					s.SetStationary();
@@ -103,6 +106,7 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 	}
 
 	// usual case: just move vertices down the screen
+	// could add velocity later :/
 	for (float& y : s.GetYValues())
 	{
 		float tmp = y + normFallSpeed * deltaTime;
@@ -111,6 +115,8 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 	s.orderingValue = s.m_YVertices[5];
 }
 
+
+// set the bottom y coords to a set point, usefull for when shit hits other things or the window border
 void Snow::SetBottomCoord(Snow& s, float pos) {
 	bool topXValues[6] = { true, false, false, true, true, false };
 	int i = 0;
@@ -123,11 +129,15 @@ void Snow::SetBottomCoord(Snow& s, float pos) {
 	s.orderingValue = s.m_YVertices[5];
 }
 
+
+// guess...
 float Snow::GetBottomYPos(Snow& s)
 {
 	return s.m_YVertices[5];
 }
 
+
+// usefull for calculating collisions between particles
 RECT Snow::GetSides(Snow& s)
 {
 	RECT r;
