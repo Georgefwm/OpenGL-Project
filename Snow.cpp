@@ -83,7 +83,7 @@ void Snow::Fall(int windowHeight, double deltaTime, Snow& s, std::vector<Snow>& 
 			RECT RectB = Snow::GetSides(ref);
 
 			// if within some y range
-			if (GetBottomYPos(s) + normFallSpeed * deltaTime > RectB.top)
+			if (GetBottomYPos(s) + normFallSpeed * deltaTime > RectB.top && RectA.top < RectB.bottom)
 			{	
 				// then check if within some x range
 				if (sqrt(pow((RectA.left + (s.m_Size / 2)) - (RectB.left + (s.m_Size / 2)), 2)) < s.m_Size/1.5)  // not perfect but looks really weird when not divided
