@@ -51,12 +51,10 @@ bool Snow::IsStationary()
 
 void Snow::TickEvents(GLFWwindow* window, double deltaTime, Snow& s, std::vector<Snow>& entities, int index)
 {
-	if (!s.IsStationary())
-	{
-		int width, height;
-		glfwGetWindowSize(window, &width, &height);
-		Fall(height, deltaTime, s, entities);
-	}
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+
+	Fall(height, deltaTime, s, entities);
 
 	// TODO: fixing weird deleting behaviour
 	/*else

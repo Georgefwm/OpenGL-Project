@@ -9,7 +9,8 @@
 
 #define WINDOWWIDTH 800
 #define WINDOWHEIGHT 800
-#define MAXSNOWCOUNT 5000
+#define MAXSNOWCOUNT 10000
+#define SNOWSPAWNRATECAP 0.001
 
 #include "Texture.h"
 #include "ShaderClass.h"
@@ -125,9 +126,9 @@ int main()
 	double lastFrame = glfwGetTime();
 	double lastSpawn = glfwGetTime();
 	
-	// TODO: Remove this
-	Snow s = Snow(0, 0);
-	entities.push_back(s);
+	
+	// Snow s = Snow(0, 0);
+	// entities.push_back(s);
 	// Good for debugging
 
 	// Main while loop
@@ -154,7 +155,7 @@ int main()
 		}
 
 		// This lets you hold down the button to continue spawning snow
-		if (lButtonDown && currentFrame-lastSpawn > 0.01) // Snow spawn limit
+		if (lButtonDown && currentFrame-lastSpawn > SNOWSPAWNRATECAP)
 		{
 			double xpos, ypos;
 			glfwGetCursorPos(window, &xpos, &ypos);
@@ -171,7 +172,11 @@ int main()
 		for (int i = 0; i < entities.size(); i++)
 		{
 			Snow& ref = entities[i];
-			Snow::TickEvents(window, deltaTime, ref, entities, i);
+			// TODO: Change to some way where I don't have to pass the whole entities vector.
+			// Prgogram noticeably slows down when lots of particles are present.
+			// Maybe find a way to pass simple collision shapes that represent many stationary particles
+			// and just update them.
+			if (!ref.IsStationary()) Snow::TickEvents(window, deltaTime, ref, entities, i);
 		}
 
 		// TODO: Figure out how to properly remove old particles

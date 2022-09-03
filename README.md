@@ -10,3 +10,9 @@ How to run:
 2. Unzip
 
 3. Run 'opengl_project.exe'
+
+
+Keys:
+
+r       :   reset (delete all particles)
+space   :   pause
