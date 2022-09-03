@@ -10,7 +10,7 @@
 #define WINDOWWIDTH 800
 #define WINDOWHEIGHT 800
 #define MAXSNOWCOUNT 10000
-#define SNOWSPAWNRATECAP 0.001
+#define SNOWSPAWNRATECAP 0.01
 
 #include "Texture.h"
 #include "ShaderClass.h"
