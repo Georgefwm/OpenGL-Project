@@ -15,4 +15,5 @@ How to run:
 Keys:
 
 r       :   reset (delete all particles)
+
 space   :   pause
