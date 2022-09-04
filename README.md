@@ -1,6 +1,6 @@
 # OpenGL-Project
 
-Having a go trying to use OpenGL.
+Having a look into OpenGL. Very simple program, not well organised/optimised.
 
 
 How to run:
