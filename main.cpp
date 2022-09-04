@@ -56,7 +56,7 @@ void WhileLMousePressed(double x, double y, int width, int height)
 }
 
 
-int main()
+int WinMain()
 {
 	entities.clear();
 	// Initialize GLFW
