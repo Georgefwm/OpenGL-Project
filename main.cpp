@@ -4,8 +4,6 @@
 #include <stb/stb_image.h>
 #include <vector>
 #include <thread>
-#include <algorithm>
-#include <iterator>
 
 #define WINDOWWIDTH 800
 #define WINDOWHEIGHT 800
